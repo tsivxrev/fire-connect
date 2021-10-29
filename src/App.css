@@ -1,0 +1,11 @@
+:root, body {
+  --accent: #e74c3c !important;
+}
+
+.vkuiButton--lvl-commerce {
+  background-color: var(--accent);
+}
+
+.vkuiContentCard__body.ContentCard__body h3 {
+  font-weight: bold;
+}
