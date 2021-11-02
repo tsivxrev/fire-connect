@@ -59,11 +59,30 @@ export default class Store {
     const { story, panel } = e.currentTarget.dataset;
     this.go({
       activeStory: story,
-      activePanel: panel || this.nav.activePanel,
+      activePanel: this.nav.activePanel || panel,
     });
   };
 
   setUser = (user) => {
     this.user = user;
   }
+
+  fetchUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.go({ activeStory: 'login' });
+      return;
+    }
+
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+    try {
+      const { data } = await api('/me/');
+
+      this.setUser(data);
+      this.go({ activeStory: 'home' });
+    } catch (err) {
+      this.showSnackbar({ message: 'Произошла ошибка' });
+    }
+  };
 }

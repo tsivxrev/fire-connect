@@ -4,7 +4,7 @@ import {
   Panel, PanelHeader, Group, CellButton, SimpleCell,
 } from '@vkontakte/vkui';
 
-import { Icon28KeyOutline } from '@vkontakte/icons';
+import { Icon28KeyOutline, Icon28Profile } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
 import api from '../api';
@@ -28,6 +28,13 @@ const Settings = (id) => {
     <Panel id={id}>
       <PanelHeader>Настройки</PanelHeader>
       <Group>
+        <SimpleCell
+          onClick={() => { store.go({ activePanel: 'editProfile' }); }}
+          expandable
+          before={<Icon28Profile />}
+        >
+          Редактировать профиль
+        </SimpleCell>
         <SimpleCell
           onClick={() => { store.go({ activePanel: 'changePassword' }); }}
           expandable

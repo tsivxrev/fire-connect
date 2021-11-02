@@ -9,7 +9,6 @@ import {
 } from '@vkontakte/vkui';
 
 import './App.css';
-import api from './api';
 import useStore from './hooks/useStore';
 
 import Loading from './panels/Loading';
@@ -18,6 +17,7 @@ import Login from './panels/Login';
 
 import Settings from './panels/Settings';
 import ChangePassword from './panels/ChangePassword';
+import EditProfile from './panels/EditProfile';
 
 const App = () => {
   const { viewWidth } = useAdaptivity();
@@ -28,26 +28,7 @@ const App = () => {
   const hasHeader = platform !== VKCOM;
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        store.go({ activeStory: 'login' });
-        return;
-      }
-
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-
-      try {
-        const { data } = await api('/me/');
-
-        store.setUser(data);
-        store.go({ activeStory: 'home' });
-      } catch (err) {
-        store.showSnackbar({ message: 'Произошла ошибка' });
-      }
-    };
-
-    fetchUser();
+    store.fetchUser();
   }, []);
 
   return (
@@ -136,6 +117,7 @@ const App = () => {
             <View id="settings" activePanel={store.nav.activePanel}>
               <Settings id="settings" />
               <ChangePassword id="changePassword" />
+              <EditProfile id="editProfile" />
             </View>
           </Epic>
         </SplitCol>

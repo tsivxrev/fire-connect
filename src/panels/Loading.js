@@ -9,9 +9,13 @@ const Loading = (id) => {
   const [isProblem, setIsProblem] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsProblem(true);
     }, 5000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (

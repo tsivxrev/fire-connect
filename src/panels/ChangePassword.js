@@ -2,7 +2,7 @@ import { React, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import {
-  Group, FormLayout, FormItem, Input,
+  Group, FormLayout, FormItem, Input, PanelHeaderBack,
   Panel, PanelHeader, Button, IconButton,
 } from '@vkontakte/vkui';
 
@@ -67,7 +67,7 @@ const ChangePassword = (id) => {
 
   return (
     <Panel id={id}>
-      <PanelHeader>Смена пароля</PanelHeader>
+      <PanelHeader left={<PanelHeaderBack onClick={() => { store.go({ activePanel: 'settings' }); }} />}>Смена пароля</PanelHeader>
       <Group>
         <FormLayout onSubmit={(e) => { e.preventDefault(); login(); }}>
           <FormItem
