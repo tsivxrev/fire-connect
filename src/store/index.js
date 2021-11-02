@@ -7,6 +7,7 @@ import api from '../api';
 export default class Store {
   nav = {
     activeStory: 'loading',
+    activePanel: null,
     snackbar: null,
     activeModal: null,
     modalProps: {},
@@ -24,6 +25,8 @@ export default class Store {
 
       return Promise.reject(error);
     });
+
+    window.store = this;
   }
 
   get ready() {
@@ -34,21 +37,31 @@ export default class Store {
     Object.assign(this.nav, to);
   }
 
-  setSnackbar = (params) => {
-    if (this.nav.snackbar || !params) return;
+  setSnackbar = (snackbar) => {
+    this.nav.snackbar = snackbar;
+  }
 
+  showSnackbar = (params) => {
+    if (this.nav.snackbar || !params) return;
     const { icon, message } = params;
-    this.nav.snackbar = (
+
+    this.setSnackbar(
       <Snackbar
         before={icon || null}
         onClose={() => this.setSnackbar(null)}
       >
         {message}
-      </Snackbar>
+      </Snackbar>,
     );
   };
 
-  onStoryChange = (e) => { this.nav.activeStory = e.currentTarget.dataset.story; };
+  onStoryChange = (e) => {
+    const { story, panel } = e.currentTarget.dataset;
+    this.go({
+      activeStory: story,
+      activePanel: panel || this.nav.activePanel,
+    });
+  };
 
   setUser = (user) => {
     this.user = user;

@@ -1,13 +1,42 @@
-import { React } from 'react';
+import { React, useState, useEffect } from 'react';
 import {
-  Panel, PanelHeader, PanelSpinner,
+  Panel, PanelHeader, PanelSpinner, Text, Group, SimpleCell, Div, CardGrid, Card,
 } from '@vkontakte/vkui';
 
-const Loading = (id) => (
-  <Panel id={id}>
-    <PanelHeader>Главная</PanelHeader>
-    <PanelSpinner />
-  </Panel>
-);
+import { Icon28RefreshOutline } from '@vkontakte/icons';
+
+const Loading = (id) => {
+  const [isProblem, setIsProblem] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsProblem(true);
+    }, 5000);
+  }, []);
+
+  return (
+    <Panel id={id}>
+      <PanelHeader>Главная</PanelHeader>
+      <PanelSpinner />
+      {isProblem && (
+      <Group>
+        <CardGrid size="l">
+          <Card style={{ padding: 5 }}>
+            <Div>
+              <Text>Кажется, что-то пошло не так. Ну что, Миша?</Text>
+            </Div>
+            <SimpleCell
+              onClick={() => { window.location.reload(); }}
+              before={<Icon28RefreshOutline />}
+            >
+              Давай по новой!
+            </SimpleCell>
+          </Card>
+        </CardGrid>
+      </Group>
+      )}
+    </Panel>
+  );
+};
 
 export default Loading;

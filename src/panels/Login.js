@@ -52,9 +52,9 @@ const Login = (id) => {
       store.setUser(data.user);
       store.go({ activeStory: 'home' });
     } catch (err) {
-      store.setSnackbar({
+      store.showSnackbar({
         icon: <Icon16ErrorCircleFill width={20} height={20} />,
-        message: err.response.data.detail ? err.response.data.detail : 'Произошла ошибка',
+        message: err.response?.data?.detail ? err.response.data.detail : 'Произошла ошибка',
       });
       setIsLoading(false);
     }

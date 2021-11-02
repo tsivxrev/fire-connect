@@ -1,8 +1,10 @@
 import { React } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
-  Panel, PanelHeader, Group, CellButton,
+  Panel, PanelHeader, Group, CellButton, SimpleCell,
 } from '@vkontakte/vkui';
+
+import { Icon28KeyOutline } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
 import api from '../api';
@@ -18,7 +20,7 @@ const Settings = (id) => {
       localStorage.removeItem('token');
       store.go({ activeStory: 'login' });
     } catch (err) {
-      store.setModal({ message: 'Опа! Ошибочка' });
+      store.showSnackbar({ message: 'Произошла ошибка' });
     }
   };
 
@@ -26,6 +28,13 @@ const Settings = (id) => {
     <Panel id={id}>
       <PanelHeader>Настройки</PanelHeader>
       <Group>
+        <SimpleCell
+          onClick={() => { store.go({ activePanel: 'changePassword' }); }}
+          expandable
+          before={<Icon28KeyOutline />}
+        >
+          Сменить пароль
+        </SimpleCell>
         <CellButton onClick={() => { logout(); }} mode="danger">Выйти из аккаунта</CellButton>
       </Group>
     </Panel>

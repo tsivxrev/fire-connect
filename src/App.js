@@ -15,18 +15,17 @@ import useStore from './hooks/useStore';
 import Loading from './panels/Loading';
 import Home from './panels/Home';
 import Login from './panels/Login';
+
 import Settings from './panels/Settings';
+import ChangePassword from './panels/ChangePassword';
 
 const App = () => {
   const { viewWidth } = useAdaptivity();
   const platform = usePlatform();
   const store = useStore();
 
-  // const isMobile = viewWidth <= ViewWidth.MOBILE;
   const isDesktop = viewWidth >= ViewWidth.TABLET;
   const hasHeader = platform !== VKCOM;
-
-  // const modals = {};
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,7 +43,7 @@ const App = () => {
         store.setUser(data);
         store.go({ activeStory: 'home' });
       } catch (err) {
-        store.setModal({ message: 'Опа! Ошибочка' });
+        store.showSnackbar({ message: 'Произошла ошибка' });
       }
     };
 
@@ -81,6 +80,7 @@ const App = () => {
                     borderRadius: 8,
                   } : {}}
                   data-story="settings"
+                  data-panel="settings"
                   onClick={store.onStoryChange}
                   before={<Icon28SettingsOutline />}
                 >
@@ -99,30 +99,26 @@ const App = () => {
         >
           <Epic
             activeStory={store.nav.activeStory}
-            tabbar={!isDesktop
+            tabbar={(!isDesktop && store.ready)
               && (
               <Tabbar>
-                {store.ready
-                && (
-                <>
-                  <TabbarItem
-                    onClick={store.onStoryChange}
-                    selected={store.nav.activeStory === 'home'}
-                    data-story="home"
-                    text="Профиль"
-                  >
-                    <Icon28Profile />
-                  </TabbarItem>
-                  <TabbarItem
-                    onClick={store.onStoryChange}
-                    selected={store.nav.activeStory === 'settings'}
-                    data-story="settings"
-                    text="Настройки"
-                  >
-                    <Icon28SettingsOutline />
-                  </TabbarItem>
-                </>
-                )}
+                <TabbarItem
+                  onClick={store.onStoryChange}
+                  selected={store.nav.activeStory === 'home'}
+                  data-story="home"
+                  text="Профиль"
+                >
+                  <Icon28Profile />
+                </TabbarItem>
+                <TabbarItem
+                  onClick={store.onStoryChange}
+                  selected={store.nav.activeStory === 'settings'}
+                  data-panel="settings"
+                  data-story="settings"
+                  text="Настройки"
+                >
+                  <Icon28SettingsOutline />
+                </TabbarItem>
               </Tabbar>
               )}
           >
@@ -137,8 +133,9 @@ const App = () => {
             <View id="home" activePanel="home">
               <Home id="home" />
             </View>
-            <View id="settings" activePanel="settings">
+            <View id="settings" activePanel={store.nav.activePanel}>
               <Settings id="settings" />
+              <ChangePassword id="changePassword" />
             </View>
           </Epic>
         </SplitCol>
