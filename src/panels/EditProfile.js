@@ -90,6 +90,7 @@ const EditProfile = (id) => {
         };
 
         store.setEmailConfirmationStatus(emailConfirmation);
+        localStorage.setItem('emailConfirmationStatus', JSON.stringify(emailConfirmation));
       } catch (err) {
         setIsLoading(false);
         setIsEmailError(true);

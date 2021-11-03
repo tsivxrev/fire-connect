@@ -8,22 +8,9 @@ import {
 import { Icon28KeyOutline, Icon28Profile } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
-import api from '../api';
 
 const Settings = (id) => {
   const store = useStore();
-
-  const logout = async () => {
-    try {
-      await api('/logout/', { method: 'POST' });
-
-      store.setUser({});
-      localStorage.removeItem('token');
-      store.go({ activeStory: 'login' });
-    } catch (err) {
-      store.showSnackbar({ message: 'Произошла ошибка' });
-    }
-  };
 
   return (
     <Panel id={id}>
@@ -68,7 +55,7 @@ const Settings = (id) => {
         >
           Сменить пароль
         </SimpleCell>
-        <CellButton onClick={() => { logout(); }} mode="danger">Выйти из аккаунта</CellButton>
+        <CellButton onClick={() => { store.logout(); }} mode="danger">Выйти из аккаунта</CellButton>
       </Group>
     </Panel>
   );

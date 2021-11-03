@@ -116,7 +116,6 @@ export default class Store {
 
   setEmailConfirmationStatus = ({ email, needed, userId }) => {
     this.emailConfirmation = { email, needed, userId };
-    localStorage.setItem('emailConfirmationStatus', JSON.stringify(this.emailConfirmation));
   }
 
   emailConfirmationOnChange = (e) => {
@@ -141,7 +140,8 @@ export default class Store {
       });
 
       this.setModal(null);
-      this.setEmailConfirmationStatus({ email: null, needed: false });
+      this.setEmailConfirmationStatus({ email: null, needed: false, userId: 0 });
+      localStorage.removeItem('emailConfirmationStatus');
       this.showSnackbar({
         icon: <Icon20Info />,
         message: 'Почта подтверждена!',
@@ -160,6 +160,7 @@ export default class Store {
       await api('/logout/', { method: 'POST' });
 
       this.setUser({});
+      this.setEmailConfirmationStatus({});
       localStorage.removeItem('token');
       this.go({ activeStory: 'login' });
     } catch (err) {
@@ -187,10 +188,7 @@ export default class Store {
       if (emailConfirmationStatus) {
         emailConfirmationStatus = JSON.parse(emailConfirmationStatus);
         if (emailConfirmationStatus.userId !== this.user.id) return;
-        if (emailConfirmationStatus.needed
-          && emailConfirmationStatus.email === this.user.email) return;
-
-        Object.assign(this.emailConfirmation, emailConfirmationStatus);
+        this.setEmailConfirmationStatus(emailConfirmationStatus);
       }
     } catch (err) {
       this.showSnackbar({ message: 'Произошла ошибка' });
