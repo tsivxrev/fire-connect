@@ -14,7 +14,7 @@ import {
 } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
-import api from '../api';
+import { senet } from '../api';
 
 function isValidDate(date) {
   date = new Date(date);
@@ -76,7 +76,7 @@ const EditProfile = (id) => {
 
     if (info.email !== store.user.email) {
       try {
-        await api('/me/email/', {
+        await senet('/me/email/', {
           method: 'POST',
           data: {
             email: info.email,
@@ -105,7 +105,7 @@ const EditProfile = (id) => {
     }
 
     try {
-      const { data } = await api('/me/', {
+      const { data } = await senet('/me/', {
         method: 'PATCH',
         data: {
           first_name: info.first_name,

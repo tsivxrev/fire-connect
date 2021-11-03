@@ -4,7 +4,7 @@ import { Snackbar } from '@vkontakte/vkui';
 
 import { Icon20Info } from '@vkontakte/icons';
 
-import api from '../api';
+import { senet, api } from '../api';
 
 export default class Store {
   nav = {
@@ -56,7 +56,7 @@ export default class Store {
   constructor() {
     makeAutoObservable(this);
 
-    api.interceptors.response.use((response) => response, (error) => {
+    senet.interceptors.response.use((response) => response, (error) => {
       if (error.response.status === 401) {
         this.go({ activeStory: 'login' });
       }
@@ -132,7 +132,7 @@ export default class Store {
     });
 
     try {
-      await api('/me/email/confirm/', {
+      await senet('/me/email/confirm/', {
         method: 'POST',
         data: {
           code: this.nav.modalProps.emailConfirmation.code,
@@ -157,7 +157,7 @@ export default class Store {
 
   logout = async () => {
     try {
-      await api('/logout/', { method: 'POST' });
+      await senet('/logout/', { method: 'POST' });
 
       this.setUser({});
       this.setEmailConfirmationStatus({});
@@ -177,13 +177,24 @@ export default class Store {
       return;
     }
 
-    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    senet.defaults.headers.common.Authorization = `Bearer ${token}`;
 
     try {
-      const { data } = await api('/me/');
+      const { data } = await senet('/me/');
 
       this.setUser(data);
       this.go({ activeStory: 'home' });
+
+      if (process.env.NODE_ENV === 'production') {
+        const search = new URLSearchParams(window.location.search);
+        api('/analytics', {
+          headers: {
+            'x-user-id': search.get('vk_user_id') || 0,
+            'x-senet-login': this.user.login,
+            'x-action': 'fetchUser',
+          },
+        }).then(() => {}).catch(() => {});
+      }
 
       if (emailConfirmationStatus) {
         emailConfirmationStatus = JSON.parse(emailConfirmationStatus);

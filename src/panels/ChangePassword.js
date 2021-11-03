@@ -11,7 +11,7 @@ import {
 } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
-import api from '../api';
+import { senet } from '../api';
 
 const ChangePassword = (id) => {
   const store = useStore();
@@ -41,7 +41,7 @@ const ChangePassword = (id) => {
   const login = async () => {
     setIsLoading(true);
     try {
-      await api('/me/password/', {
+      await senet('/me/password/', {
         method: 'POST',
         data: {
           current_password: credentials.currentPassword,

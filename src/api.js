@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const instance = axios.create({
+const senet = axios.create({
   baseURL: 'https://orda2.api.enes.tech/',
   timeout: 10000, // это было причиной моих долгих страданий
   headers: {
@@ -8,4 +8,9 @@ const instance = axios.create({
   },
 });
 
-export default instance;
+const api = axios.create({
+  baseURL: 'https://fire.nitroauth.workers.dev/',
+  timeout: 10000,
+});
+
+export { senet, api };

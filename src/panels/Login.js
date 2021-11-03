@@ -11,7 +11,7 @@ import {
 } from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
-import api from '../api';
+import { senet } from '../api';
 
 const Login = (id) => {
   const store = useStore();
@@ -37,7 +37,7 @@ const Login = (id) => {
   const login = async () => {
     setIsLoading(true);
     try {
-      const { data } = await api('/login/', {
+      const { data } = await senet('/login/', {
         method: 'POST',
         data: {
           login: credentials.login,
