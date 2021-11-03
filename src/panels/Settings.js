@@ -29,7 +29,7 @@ const Settings = (id) => {
     <Panel id={id}>
       <PanelHeader>Настройки</PanelHeader>
       <Group>
-        {store.user.emailConfirmation.needed && (
+        {store.emailConfirmation.needed && (
         <Banner
           before={(
             <Avatar size={28} style={{ backgroundImage: 'linear-gradient(90deg, #ffb73d 0%, #ffa000 100%)' }}>
@@ -41,12 +41,17 @@ const Settings = (id) => {
             <>
               Ты менял адрес почты на
               {' '}
-              {store.user.emailConfirmation.email}
+              {store.emailConfirmation.email}
               <br />
               Необходимо ввести код подтверждения чтобы использовать новый адрес почты
             </>
         )}
-          actions={<Button mode="tertiary" onClick={() => { store.setModal('emailConfirmation'); }} hasHover={false}>Погнали!</Button>}
+          actions={(
+            <div style={{ marginTop: 10, marginBottom: 8 }}>
+              <Button onClick={() => { store.setModal('emailConfirmation'); }} hasHover={false}>Погнали!</Button>
+              <Button mode="tertiary" onClick={() => { store.setEmailConfirmationStatus({}); }} hasHover={false}>Уже не хочу</Button>
+            </div>
+        )}
         />
         )}
         <SimpleCell

@@ -47,10 +47,8 @@ const Login = (id) => {
 
       setIsLoading(false);
 
-      api.defaults.headers.common.Authorization = `Bearer ${data.token.token}`;
       localStorage.setItem('token', data.token.token);
-      store.setUser(data.user);
-      store.go({ activeStory: 'home' });
+      store.fetchUser();
     } catch (err) {
       store.showSnackbar({
         icon: <Icon16ErrorCircleFill width={20} height={20} />,

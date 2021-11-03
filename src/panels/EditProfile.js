@@ -45,14 +45,14 @@ const EditProfile = (id) => {
   const [canChange, setCanChange] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [info, setInfo] = useState({
-    first_name: store.user.first_name,
-    birthdate: store.user.birthdate,
-    phone: store.user.phone,
-    email: store.user.email,
+    first_name: store.user.first_name || '',
+    birthdate: store.user.birthdate || '2000-01-01',
+    phone: store.user.phone || '',
+    email: store.user.email || '',
   });
 
   useEffect(() => {
-    setCanChange(info.first_name.length && info.birthdate);
+    setCanChange(info.first_name.length && isValidDate(info.birthdate) && info.phone.length);
   }, []);
 
   const onChange = (e) => {
@@ -84,6 +84,7 @@ const EditProfile = (id) => {
         });
 
         const emailConfirmation = {
+          userId: store.user.id,
           email: info.email,
           needed: true,
         };

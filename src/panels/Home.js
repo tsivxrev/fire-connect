@@ -1,20 +1,52 @@
 import { React } from 'react';
 import { observer } from 'mobx-react-lite';
+import humanizeDuration from 'humanize-duration';
 
 import {
-  Group, Div, Progress, Card, Caption, Title,
-  Panel, PanelHeader, CardGrid, MiniInfoCell,
+  Group, Div, Progress, Card, Caption, Title, Header,
+  Panel, PanelHeader, CardGrid, Text,
 } from '@vkontakte/vkui';
-
-import {
-  Icon20PhoneOutline, Icon24MailOutline,
-  Icon20CalendarOutline,
-} from '@vkontakte/icons';
 
 import useStore from '../hooks/useStore';
 
 const Home = (id) => {
   const store = useStore();
+
+  const zonesList = Object.keys(store.zones).map((key) => (
+    <Card key={key}>
+      <Div>
+        <Caption level="3" weight="medium" style={{ marginBottom: 4 }}>{store.zones[key].name}</Caption>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Title style={{ marginRight: 5 }} level="1" weight="bold">
+            {store.zones[key].price - (100 * (store.user.active_account.level * 0.01))}
+            {' '}
+            ₽
+          </Title>
+          <Text style={{ color: 'var(--text_secondary)', marginRight: 5 }} level="3" weight="regular">/час</Text>
+        </div>
+        {(+store.user.active_account.account_amount
+          > 0 && store.user.active_account.level < 100) && (
+          <Text style={{ color: 'var(--text_secondary)', marginBottom: 4 }} level="4" weight="regular">
+            У тебя
+            {' '}
+            {humanizeDuration(((
+              store.user.active_account.account_amount
+            / (store.zones[key].price - (100 * (store.user.active_account.level * 0.01))))
+            * 3600) * 1000,
+            {
+              language: 'ru',
+              round: true,
+              delimiter: ' и ',
+              units: ['h', 'm'],
+            })}
+            {' '}
+            игры в этой зоне
+          </Text>
+        )}
+      </Div>
+    </Card>
+  ));
+
   return (
     <Panel id={id}>
       <PanelHeader>Главная</PanelHeader>
@@ -78,7 +110,12 @@ const Home = (id) => {
             </Div>
           </Card>
         </CardGrid>
-        <MiniInfoCell
+        <Group mode="plain" header={<Header mode="secondary">Твой тариф</Header>}>
+          <CardGrid size="l">
+            {zonesList}
+          </CardGrid>
+        </Group>
+        {/*         <MiniInfoCell
           before={<Icon20CalendarOutline />}
         >
           {store.user.birthdate || 'Дата рождения не установлена'}
@@ -93,7 +130,7 @@ const Home = (id) => {
           before={<Icon20PhoneOutline />}
         >
           {store.user.login}
-        </MiniInfoCell>
+        </MiniInfoCell> */}
       </Group>
     </Panel>
   );

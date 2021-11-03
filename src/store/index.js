@@ -23,10 +23,33 @@ export default class Store {
     },
   }
 
-  user = {
-    emailConfirmation: {
-      needed: false,
-      email: null,
+  user = {}
+
+  emailConfirmation = {
+    needed: false,
+    email: null,
+    userId: null,
+  }
+
+  gallery = [
+    'https://sun9-41.userapi.com/impg/Oypr4gM2svjQEwUf0qHdTnm1EtpkZIvZYpEYjw/B_w0KosA0Ak.jpg?size=1280x853&quality=96&sign=08c36c524b12366d2713317e217c59b9&type=album',
+    'https://sun9-67.userapi.com/impg/GnOpOhkWKHSzZooE0MGp0r-Y2WiNQFRVLnMigg/RYXKfIZ30fQ.jpg?size=1280x853&quality=96&sign=a65ac8229a6e00da6f67f06437b28a15&type=album',
+    'https://sun9-72.userapi.com/impg/Z24VVNY7liI6CaygPMO7FrxJ6O1JFZsM9q0zRg/2qqdaydOxxE.jpg?size=1280x853&quality=96&sign=aded2e2fa8fb679fc6bd5c2f154221fc&type=album',
+    'https://sun9-31.userapi.com/impg/yoJQaZXJxiFWr_MvG0aZHwrqWuw4C5eEksAtig/VwnXl39UhBM.jpg?size=1280x853&quality=96&sign=5225fb130d73ccbcbfede51dff78c678&type=album',
+  ]
+
+  zones = {
+    standart: {
+      name: 'STANDART ZONE',
+      price: 100, // руб/час
+    },
+    medium: {
+      name: 'MEDIUM ZONE',
+      price: 110,
+    },
+    vip: {
+      name: 'VIP ZONE',
+      price: 120,
     },
   }
 
@@ -45,7 +68,7 @@ export default class Store {
   }
 
   get ready() {
-    return Object.keys(this.user).length !== 0;
+    return !!this.user.id;
   }
 
   go = (to) => {
@@ -83,17 +106,17 @@ export default class Store {
     const { story, panel } = e.currentTarget.dataset;
     this.go({
       activeStory: story,
-      activePanel: this.nav.activePanel || panel,
+      activePanel: panel,
     });
   };
 
   setUser = (user) => {
-    Object.assign(this.user, user);
+    this.user = user;
   }
 
-  setEmailConfirmationStatus = ({ email, needed }) => {
-    Object.assign(this.user.emailConfirmation, { email, needed });
-    localStorage.setItem('emailConfirmationStatus', JSON.stringify({ email, needed }));
+  setEmailConfirmationStatus = ({ email, needed, userId }) => {
+    this.emailConfirmation = { email, needed, userId };
+    localStorage.setItem('emailConfirmationStatus', JSON.stringify(this.emailConfirmation));
   }
 
   emailConfirmationOnChange = (e) => {
@@ -132,6 +155,18 @@ export default class Store {
     }
   };
 
+  logout = async () => {
+    try {
+      await api('/logout/', { method: 'POST' });
+
+      this.setUser({});
+      localStorage.removeItem('token');
+      this.go({ activeStory: 'login' });
+    } catch (err) {
+      this.showSnackbar({ message: 'Произошла ошибка' });
+    }
+  }
+
   fetchUser = async () => {
     const token = localStorage.getItem('token');
     let emailConfirmationStatus = localStorage.getItem('emailConfirmationStatus');
@@ -151,10 +186,11 @@ export default class Store {
 
       if (emailConfirmationStatus) {
         emailConfirmationStatus = JSON.parse(emailConfirmationStatus);
+        if (emailConfirmationStatus.userId !== this.user.id) return;
         if (emailConfirmationStatus.needed
           && emailConfirmationStatus.email === this.user.email) return;
 
-        Object.assign(this.user.emailConfirmation, emailConfirmationStatus);
+        Object.assign(this.emailConfirmation, emailConfirmationStatus);
       }
     } catch (err) {
       this.showSnackbar({ message: 'Произошла ошибка' });

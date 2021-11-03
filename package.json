@@ -13,6 +13,7 @@
     "@vkontakte/vk-bridge": "^2.4.8",
     "@vkontakte/vkui": "^4.19.0",
     "axios": "^0.23.0",
+    "humanize-duration": "^3.27.0",
     "mobx": "^6.3.5",
     "mobx-react-lite": "^3.2.1",
     "react": "^17.0.2",

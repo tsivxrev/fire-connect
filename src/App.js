@@ -1,7 +1,9 @@
 import { React, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Icon28Profile, Icon28SettingsOutline, Icon56MailOutline } from '@vkontakte/icons';
+import {
+  Icon28Profile, Icon28SettingsOutline, Icon56MailOutline, Icon28TvOutline,
+} from '@vkontakte/icons';
 import {
   AppRoot, SplitLayout, SplitCol, Panel, PanelHeader,
   useAdaptivity, usePlatform, ViewWidth, VKCOM, Group,
@@ -13,12 +15,16 @@ import './App.css';
 import useStore from './hooks/useStore';
 
 import Loading from './panels/Loading';
-import Home from './panels/Home';
 import Login from './panels/Login';
+
+import Home from './panels/Home';
+import Club from './panels/Club';
+import GamesList from './panels/Content';
 
 import Settings from './panels/Settings';
 import ChangePassword from './panels/ChangePassword';
 import EditProfile from './panels/EditProfile';
+import Pricelist from './panels/Pricelist';
 
 const App = () => {
   const { viewWidth } = useAdaptivity();
@@ -99,6 +105,19 @@ const App = () => {
                   Профиль
                 </Cell>
                 <Cell
+                  disabled={store.nav.activeStory === 'club'}
+                  style={store.nav.activeStory === 'club' ? {
+                    backgroundColor: 'var(--button_secondary_background)',
+                    borderRadius: 8,
+                  } : {}}
+                  data-story="club"
+                  data-panel="club"
+                  onClick={store.onStoryChange}
+                  before={<Icon28TvOutline />}
+                >
+                  Клуб
+                </Cell>
+                <Cell
                   disabled={store.nav.activeStory === 'settings'}
                   style={store.nav.activeStory === 'settings' ? {
                     backgroundColor: 'var(--button_secondary_background)',
@@ -137,6 +156,15 @@ const App = () => {
                 </TabbarItem>
                 <TabbarItem
                   onClick={store.onStoryChange}
+                  selected={store.nav.activeStory === 'club'}
+                  data-panel="club"
+                  data-story="club"
+                  text="Клуб"
+                >
+                  <Icon28TvOutline />
+                </TabbarItem>
+                <TabbarItem
+                  onClick={store.onStoryChange}
                   selected={store.nav.activeStory === 'settings'}
                   data-panel="settings"
                   data-story="settings"
@@ -158,6 +186,13 @@ const App = () => {
             <View id="home" activePanel="home">
               <Home id="home" />
             </View>
+
+            <View id="club" activePanel={store.nav.activePanel}>
+              <Club id="club" />
+              <Pricelist id="pricelist" />
+              <GamesList id="games" />
+            </View>
+
             <View id="settings" activePanel={store.nav.activePanel}>
               <Settings id="settings" />
               <ChangePassword id="changePassword" />
