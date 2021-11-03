@@ -1,11 +1,12 @@
 import { React, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Icon28Profile, Icon28SettingsOutline } from '@vkontakte/icons';
+import { Icon28Profile, Icon28SettingsOutline, Icon56MailOutline } from '@vkontakte/icons';
 import {
   AppRoot, SplitLayout, SplitCol, Panel, PanelHeader,
   useAdaptivity, usePlatform, ViewWidth, VKCOM, Group,
-  Cell, Tabbar, TabbarItem, Epic, View,
+  Cell, Tabbar, TabbarItem, Epic, View, ModalRoot, ModalCard,
+  Button, FormLayout, FormItem, Input,
 } from '@vkontakte/vkui';
 
 import './App.css';
@@ -27,6 +28,48 @@ const App = () => {
   const isDesktop = viewWidth >= ViewWidth.TABLET;
   const hasHeader = platform !== VKCOM;
 
+  const modal = (
+    <ModalRoot activeModal={store.nav.activeModal}>
+      <ModalCard
+        id="emailConfirmation"
+        onClose={() => store.setModal(null)}
+        actions={(
+          <Button
+            loading={store.nav.modalProps.emailConfirmation.isLoading}
+            disabled={!store.nav.modalProps.emailConfirmation.canSubmit}
+            onClick={() => store.confirmEmail()}
+            size="l"
+            mode="commerce"
+          >
+            Подтвердить
+          </Button>
+        )}
+        icon={<Icon56MailOutline />}
+        header="Проверь почту"
+        subheader="Найди письмо от Enestech с кодом подтверждения и введи его ниже"
+      >
+        <FormLayout>
+          <FormItem
+            style={{ paddingTop: 10, paddingBottom: 5 }}
+            top="Код подтверждения"
+            status={store.nav.modalProps.emailConfirmation.isError ? 'error' : 'default'}
+            bottom={
+              store.nav.modalProps.emailConfirmation.isError
+              && store.nav.modalProps.emailConfirmation.errorMessage
+            }
+          >
+            <Input
+              type="text"
+              name="code"
+              placeholder="jQ7aLW"
+              onChange={store.emailConfirmationOnChange}
+            />
+          </FormItem>
+        </FormLayout>
+      </ModalCard>
+    </ModalRoot>
+  );
+
   useEffect(() => {
     store.fetchUser();
   }, []);
@@ -34,6 +77,7 @@ const App = () => {
   return (
     <AppRoot>
       <SplitLayout
+        modal={modal}
         header={hasHeader && <PanelHeader separator={false} />}
         style={{ justifyContent: 'center' }}
       >

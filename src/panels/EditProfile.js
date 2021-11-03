@@ -40,11 +40,15 @@ const parseDate = (date) => {
 
 const EditProfile = (id) => {
   const store = useStore();
+  const [isEmailError, setIsEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('Неизвестная ошибка');
   const [canChange, setCanChange] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [info, setInfo] = useState({
     first_name: store.user.first_name,
     birthdate: store.user.birthdate,
+    phone: store.user.phone,
+    email: store.user.email,
   });
 
   useEffect(() => {
@@ -64,17 +68,47 @@ const EditProfile = (id) => {
     }
 
     setInfo(Object.assign(info, { [name]: value }));
-    setCanChange(info.first_name.length && isValidDate(info.birthdate));
+    setCanChange(info.first_name.length && isValidDate(info.birthdate) && info.phone.length);
   };
 
   const editProfile = async () => {
     setIsLoading(true);
+
+    if (info.email !== store.user.email) {
+      try {
+        await api('/me/email/', {
+          method: 'POST',
+          data: {
+            email: info.email,
+          },
+        });
+
+        const emailConfirmation = {
+          email: info.email,
+          needed: true,
+        };
+
+        store.setEmailConfirmationStatus(emailConfirmation);
+      } catch (err) {
+        setIsLoading(false);
+        setIsEmailError(true);
+
+        const error = err.response?.data || null;
+        if (error?.field_errors?.email) {
+          setEmailErrorMessage(error?.field_errors?.email.join('\n'));
+        }
+
+        return;
+      }
+    }
+
     try {
       const { data } = await api('/me/', {
         method: 'PATCH',
         data: {
           first_name: info.first_name,
           birthdate: info.birthdate,
+          phone: info.phone,
         },
       });
 
@@ -89,7 +123,7 @@ const EditProfile = (id) => {
     } catch (err) {
       store.showSnackbar({
         icon: <Icon16ErrorCircleFill width={20} height={20} />,
-        message: err.response?.data?.detail ? err.response.data.detail : 'Произошла ошибка',
+        message: err.response?.data?.detail || 'Произошла ошибка',
       });
       setIsLoading(false);
     }
@@ -111,6 +145,18 @@ const EditProfile = (id) => {
               onChange={onChange}
             />
           </FormItem>
+          <FormItem
+            top="Номер телефона"
+            bottom="Это поле не меняет номер по которому ты входишь в аккаунт, этот номер телефона будет указан в качестве контактной информации"
+          >
+            <Input
+              type="text"
+              name="phone"
+              placeholder="+7"
+              defaultValue={info.phone}
+              onChange={onChange}
+            />
+          </FormItem>
           <FormItem top="Дата рождения">
             <DatePicker
               min={{ day: 1, month: 1, year: 1945 }}
@@ -121,6 +167,19 @@ const EditProfile = (id) => {
               defaultValue={info.birthdate && parseDate(info.birthdate)}
               name="birthdate"
               onDateChange={onChange}
+            />
+          </FormItem>
+          <FormItem
+            top="E-mail"
+            status={isEmailError ? 'error' : 'default'}
+            bottom={isEmailError && emailErrorMessage}
+          >
+            <Input
+              type="email"
+              name="email"
+              onFocus={() => { setEmailErrorMessage(''); setIsEmailError(false); }}
+              defaultValue={info.email}
+              onChange={onChange}
             />
           </FormItem>
           <FormItem>
